@@ -1,0 +1,25 @@
+# Write an empty commit every month to prevent GitHub from disabling scheduled workflows due to inactivity.
+# https://docs.github.com/en/actions/how-tos/manage-workflow-runs/disable-and-enable-workflows
+name: Touch
+
+on:
+  schedule:
+    - cron: "0 0 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  touch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+      - name: touch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "$(printf '%(%Y-%m-%dT%H:%M:%S%z)T\n' -1)"
+          git push
